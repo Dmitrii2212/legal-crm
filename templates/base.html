@@ -1,0 +1,54 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="htmx-config" content='{"historyRestoreAsHxRequest": false, "allowEval": false, "allowScriptTags": false}'>
+  <title>{% block title %}Рабочее пространство{% endblock %} · Legal CRM</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/dist/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/crm.css' %}">
+  <script src="{% static 'vendor/htmx/dist/htmx.min.js' %}" defer></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body hx-history="false">
+  <a class="visually-hidden-focusable skip-link" href="#main-content">Перейти к содержимому</a>
+  <header class="app-header">
+    <div class="app-shell app-top">
+      <a class="app-brand" href="{% url 'tasks:dashboard' %}">
+        <span class="app-mark" aria-hidden="true"></span>
+        <span>Legal CRM</span>
+      </a>
+      {% if user.is_authenticated %}
+        <div class="app-account">
+          <span class="app-zone" title="Московское время">МСК</span>
+          <span class="app-username" title="{{ user.get_username }}">{{ user.get_username }}</span>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="app-signout">Выйти</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+    {% if user.is_authenticated %}
+      {% with route=request.resolver_match %}
+        <div class="app-nav-band">
+          <nav class="app-shell app-nav" aria-label="Основная навигация">
+            <a href="{% url 'tasks:dashboard' %}"{% if route.url_name == 'dashboard' %} aria-current="page"{% endif %}>Рабочий стол</a>
+            <a href="{% url 'clients:list' %}"{% if route.namespace == 'clients' %} aria-current="{% if route.url_name == 'list' %}page{% else %}location{% endif %}"{% endif %}>Клиенты</a>
+            <a href="{% url 'cases:list' %}"{% if route.namespace == 'cases' %} aria-current="{% if route.url_name == 'list' %}page{% else %}location{% endif %}"{% endif %}>Судебные дела</a>
+            <a href="{% url 'tasks:calendar' %}"{% if route.url_name == 'calendar' %} aria-current="page"{% endif %}>Календарь</a>
+          </nav>
+        </div>
+      {% endwith %}
+    {% endif %}
+  </header>
+  <main id="main-content" class="app-shell app-main" tabindex="-1">
+    {% for message in messages %}
+      <div class="alert alert-{% if message.level_tag == 'error' %}danger{% elif message.level_tag %}{{ message.level_tag }}{% else %}info{% endif %}" role="status">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

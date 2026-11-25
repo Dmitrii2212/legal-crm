@@ -1,0 +1,14 @@
+<section class="card card-body mb-3" aria-labelledby="{{ formset.prefix }}-heading" data-formset data-formset-max="{{ formset.max_num }}">
+    <h2 class="h5 mb-3" id="{{ formset.prefix }}-heading">{{ heading }}</h2>
+    {{ formset.management_form }}
+    {% for error in formset.non_form_errors %}<p class="alert alert-danger">{{ error }}</p>{% endfor %}
+    <div class="vstack gap-2" data-formset-rows>
+        {% for row in formset %}
+            {% include 'cases/formset_row.html' with row=row only %}
+        {% endfor %}
+    </div>
+    <template data-formset-prototype>
+        {% include 'cases/formset_row.html' with row=formset.empty_form only %}
+    </template>
+    <button type="button" class="btn btn-outline-primary align-self-start mt-3" data-formset-add hidden>{{ add_label }}</button>
+</section>

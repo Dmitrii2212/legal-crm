@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Рабочий стол{% endblock %}
+
+{% block extra_head %}<link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">{% endblock %}
+
+{% block content %}
+<header class="page-header task-page-header">
+  <div>
+    <h1>Рабочий стол</h1>
+    <p class="text-muted mb-0"><time datetime="{{ today|date:'Y-m-d' }}">{{ today|date:"l, j E Y"|capfirst }}</time> · МСК</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{% url 'tasks:calendar' %}" class="btn btn-outline-primary">Календарь</a>
+    <a href="{% url 'tasks:create' %}" class="btn btn-primary">Добавить задачу или срок</a>
+  </div>
+</header>
+
+<div class="dashboard-groups">
+  {% for group in groups %}
+    <section class="surface dashboard-group dashboard-group--{{ group.modifier }}" aria-labelledby="group-{{ group.modifier }}">
+      <header class="dashboard-group-heading">
+        <h2 id="group-{{ group.modifier }}">{{ group.title }}</h2>
+        <span class="dashboard-group-count">{{ group.tasks|length }}</span>
+      </header>
+      <ul class="list-unstyled mb-0">
+        {% for task in group.tasks %}
+          <li class="dashboard-task">
+            <div class="dashboard-task-meta">
+              <time datetime="{{ task.due_at|date:'c' }}">
+                {% if group.modifier == "today" %}
+                  {{ task.due_at|date:"H:i" }}
+                {% else %}
+                  {{ task.due_at|date:"j E, H:i" }}
+                {% endif %}
+              </time>
+              <span>{{ task.get_kind_display }}</span>
+            </div>
+            <a class="dashboard-task-title" href="{% url 'tasks:detail' task.pk %}">{{ task.title }}</a>
+            <div class="dashboard-task-footer">
+              <a class="task-case-link" href="{% url 'cases:detail' task.case_id %}">{{ task.case.number }}</a>
+              {% include "tasks/status.html" %}
+            </div>
+          </li>
+        {% empty %}
+          <li class="dashboard-empty text-muted">{{ group.empty }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endfor %}
+</div>
+{% endblock %}

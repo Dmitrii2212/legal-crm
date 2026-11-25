@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Судебные дела{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <h1 class="h2 mb-0">Судебные дела</h1>
+    <a class="btn btn-primary" href="{% url 'cases:create' %}">Новое дело</a>
+</div>
+
+<form method="get" class="card card-body mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md">
+            <label class="form-label" for="case-search">Поиск дела</label>
+            <input class="form-control" type="search" name="q" id="case-search" value="{{ query }}" placeholder="Номер, название или клиент">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="case-stage">Стадия</label>
+            <select class="form-select" name="stage" id="case-stage">
+                <option value="">Все стадии</option>
+                {% for value, label in stages %}
+                    <option value="{{ value }}"{% if stage == value %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto d-flex gap-2">
+            <button type="submit" class="btn btn-outline-primary">Найти</button>
+            {% if query or stage %}
+                <a class="btn btn-outline-secondary" href="{% url 'cases:list' %}">Сбросить</a>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+{% if page_obj %}
+    <div class="card overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Дело</th>
+                        <th scope="col">Клиент</th>
+                        <th scope="col">Суд</th>
+                        <th scope="col">Стадия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for case in page_obj %}
+                        <tr>
+                            <td>
+                                <a class="fw-semibold text-break" href="{{ case.get_absolute_url }}">{{ case.number }}</a>
+                                <div class="small text-body-secondary text-break">{{ case.title }}</div>
+                            </td>
+                            <td>{{ case.client.full_name }}</td>
+                            <td>{{ case.court_name }}</td>
+                            <td><span class="badge text-bg-light border text-wrap">{{ case.get_stage_display }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if page_obj.has_other_pages %}
+        <nav class="d-flex flex-wrap align-items-center gap-3 my-3" aria-label="Страницы списка дел">
+            {% if page_obj.has_previous %}
+                <a class="btn btn-sm btn-outline-secondary" href="{% querystring page=page_obj.previous_page_number %}">Назад</a>
+            {% endif %}
+            <span class="small text-body-secondary">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a class="btn btn-sm btn-outline-secondary" href="{% querystring page=page_obj.next_page_number %}">Далее</a>
+            {% endif %}
+        </nav>
+    {% endif %}
+{% elif query or stage %}
+    <div class="card card-body text-body-secondary">По заданным условиям дела не найдены.</div>
+{% else %}
+    <div class="card card-body text-body-secondary">В реестре пока нет судебных дел.</div>
+{% endif %}
+{% endblock %}

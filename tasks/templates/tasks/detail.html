@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block extra_head %}<link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">{% endblock %}
+
+{% block content %}
+<nav aria-label="Хлебные крошки">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'tasks:dashboard' %}">Рабочий стол</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ task.get_kind_display }}</li>
+  </ol>
+</nav>
+<header class="page-header task-page-header">
+  <div>
+    <h1>{{ task.title }}</h1>
+    <p class="text-muted mb-0">{{ task.get_kind_display }}</p>
+  </div>
+  <a href="{% url 'tasks:edit' task.pk %}" class="btn btn-primary">Редактировать</a>
+</header>
+
+<div class="surface task-record">
+  <dl class="row mb-0">
+    <dt class="col-sm-4">Судебное дело</dt>
+    <dd class="col-sm-8"><a href="{% url 'cases:detail' task.case_id %}">{{ task.case.number }} · {{ task.case.title }}</a></dd>
+    <dt class="col-sm-4">Дата и время</dt>
+    <dd class="col-sm-8"><time datetime="{{ task.due_at|date:'c' }}">{{ task.due_at|date:"j E Y, H:i" }}</time> МСК</dd>
+    <dt class="col-sm-4">Статус</dt>
+    <dd class="col-sm-8">{% include "tasks/status.html" %}</dd>
+    {% if task.description %}
+      <dt class="col-sm-4">Описание</dt>
+      <dd class="col-sm-8">{{ task.description|linebreaksbr }}</dd>
+    {% endif %}
+  </dl>
+</div>
+{% endblock %}

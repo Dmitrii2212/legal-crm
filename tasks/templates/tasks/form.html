@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if task %}Редактирование{% else %}Новая задача или срок{% endif %}{% endblock %}
+
+{% block extra_head %}<link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">{% endblock %}
+
+{% block content %}
+<nav aria-label="Хлебные крошки">
+  <ol class="breadcrumb">
+    {% if task %}
+      <li class="breadcrumb-item"><a href="{% url 'tasks:detail' task.pk %}">{{ task.title }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Редактирование</li>
+    {% elif case %}
+      <li class="breadcrumb-item"><a href="{% url 'cases:detail' case.pk %}">{{ case.number }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Новая задача или срок</li>
+    {% else %}
+      <li class="breadcrumb-item"><a href="{% url 'tasks:dashboard' %}">Рабочий стол</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Новая задача или срок</li>
+    {% endif %}
+  </ol>
+</nav>
+<header class="page-header task-page-header">
+  <h1>{% if task %}Редактирование задачи или срока{% else %}Новая задача или срок{% endif %}</h1>
+</header>
+<div class="surface task-record">
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% if case %}
+      <div class="mb-3">
+        <div class="form-label">Судебное дело</div>
+        <a href="{% url 'cases:detail' case.pk %}">{{ case.number }} · {{ case.title }}</a>
+      </div>
+    {% endif %}
+
+    <div class="row g-3">
+      {% for field in form %}
+        <div class="{% if field.name == 'case' or field.name == 'title' or field.name == 'description' %}col-12{% else %}col-md-4{% endif %}">
+          <label class="form-label" for="{{ field.id_for_label }}">
+            {{ field.label }}{% if field.field.required %} <span class="text-danger" aria-hidden="true">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}<div class="form-text" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}
+            <div class="invalid-feedback d-block" id="{{ field.auto_id }}_error">
+              {% for error in field.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+          {% if field.name == "case" and not task %}
+            <a class="d-inline-block mt-2 small" href="{% url 'cases:create' %}">Создать судебное дело</a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+      {% if task %}
+        <a class="btn btn-outline-secondary" href="{% url 'tasks:detail' task.pk %}">Отмена</a>
+      {% elif case %}
+        <a class="btn btn-outline-secondary" href="{% url 'cases:detail' case.pk %}">Отмена</a>
+      {% else %}
+        <a class="btn btn-outline-secondary" href="{% url 'tasks:dashboard' %}">Отмена</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

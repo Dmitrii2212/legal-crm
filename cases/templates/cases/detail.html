@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Дело {{ case.number }}{% endblock %}
+
+{% block content %}
+<nav class="mb-3" aria-label="Навигация по делам">
+    <a href="{% url 'cases:list' %}">Все дела</a>
+</nav>
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+    <div class="text-break">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+            <span class="fw-semibold text-body-secondary">{{ case.number }}</span>
+            <span class="badge text-bg-light border">{{ case.get_stage_display }}</span>
+        </div>
+        <h1 class="h2 mb-0">{{ case.title }}</h1>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-primary" href="{% url 'cases:edit' case.pk %}">Редактировать</a>
+        <a class="btn btn-primary" href="{% url 'tasks:create_for_case' case.pk %}">Добавить задачу или срок</a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <section class="card card-body h-100">
+            <h2 class="h5 mb-3">Сведения о деле</h2>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Клиент</dt>
+                <dd class="col-sm-8"><a href="{% url 'clients:detail' case.client_id %}">{{ case.client.full_name }}</a></dd>
+                <dt class="col-sm-4">Суд</dt>
+                <dd class="col-sm-8">{{ case.court_name }}</dd>
+                <dt class="col-sm-4">Реквизиты суда</dt>
+                <dd class="col-sm-8 text-break">
+                    {% if case.court_details %}{{ case.court_details|linebreaksbr }}{% else %}<span class="text-body-secondary">Не указаны</span>{% endif %}
+                </dd>
+                <dt class="col-sm-4">Судья</dt>
+                <dd class="col-sm-8">
+                    {% if case.judge %}{{ case.judge }}{% else %}<span class="text-body-secondary">Не указан</span>{% endif %}
+                </dd>
+            </dl>
+        </section>
+    </div>
+    <div class="col-lg-7">
+        <section class="card card-body h-100">
+            <h2 class="h5 mb-3">Участники дела</h2>
+            <ul class="list-group list-group-flush">
+                {% for participant in case.participants.all %}
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-baseline flex-wrap gap-2">
+                        {% if participant.client_id %}
+                            <a class="text-break" href="{% url 'clients:detail' participant.client_id %}">{{ participant.name }}</a>
+                        {% else %}
+                            <span class="text-break">{{ participant.name }}</span>
+                        {% endif %}
+                        <span class="small text-body-secondary">{{ participant.get_role_display }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item px-0 text-body-secondary">Участники пока не добавлены.</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+    <div class="col-lg-5">
+        <section class="card card-body h-100">
+            <h2 class="h5 mb-3">Материалы дела</h2>
+            <ul class="list-group list-group-flush">
+                {% for material in case.materials.all %}
+                    <li class="list-group-item px-0 text-break">
+                        <a href="{{ material.url }}" target="_blank" rel="noopener noreferrer">{{ material.title }}<span class="visually-hidden"> (откроется в новой вкладке)</span></a>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item px-0 text-body-secondary">Ссылки пока не добавлены.</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+    <div class="col-lg-7">
+        <section class="card card-body h-100">
+            <h2 class="h5 mb-3">Задачи и сроки</h2>
+            <ul class="list-group list-group-flush">
+                {% for task in case.tasks.all %}
+                    <li class="list-group-item px-0 d-flex align-items-baseline justify-content-between flex-wrap gap-2">
+                        <div class="text-break">
+                            <a href="{% url 'tasks:detail' task.pk %}">{{ task.title }}</a>
+                            <div class="small text-body-secondary">{{ task.get_kind_display }} · {{ task.get_status_display }}</div>
+                        </div>
+                        <time class="small text-body-secondary" datetime="{{ task.due_at|date:'c' }}">{{ task.due_at|date:"d.m.Y, H:i" }}</time>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item px-0 text-body-secondary">Задачи и сроки пока не добавлены.</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endblock %}

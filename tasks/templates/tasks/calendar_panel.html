@@ -1,0 +1,58 @@
+<section class="surface calendar-panel" id="calendar-panel" aria-labelledby="month-heading">
+  {% url "tasks:calendar" as calendar_url %}
+  <header class="calendar-header">
+    <h2 id="month-heading">{{ month|date:"F Y"|capfirst }}</h2>
+    <nav class="calendar-nav" aria-label="Навигация по месяцам" hx-target="#calendar-panel" hx-swap="outerHTML" hx-push-url="true">
+      {% if previous_month %}
+        <a href="{{ calendar_url }}?month={{ previous_month }}" hx-get="{{ calendar_url }}?month={{ previous_month }}" class="btn btn-outline-secondary calendar-nav-arrow" aria-label="Предыдущий месяц">‹</a>
+      {% endif %}
+      <a href="{{ calendar_url }}" hx-get="{{ calendar_url }}" class="btn btn-outline-secondary">Сегодня</a>
+      {% if following_month %}
+        <a href="{{ calendar_url }}?month={{ following_month }}" hx-get="{{ calendar_url }}?month={{ following_month }}" class="btn btn-outline-secondary calendar-nav-arrow" aria-label="Следующий месяц">›</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <div class="calendar-grid">
+    {% for weekday in weekdays %}
+      <div class="calendar-weekday">{{ weekday }}</div>
+    {% endfor %}
+
+    {% for week in weeks %}
+      {% for day in week %}
+        {% if day %}
+          <div class="calendar-day{% if day.date == today %} calendar-day--today{% endif %}{% if day.tasks %} calendar-day--has-tasks{% endif %}">
+            <time class="calendar-day-number" datetime="{{ day.date.isoformat }}"{% if day.date == today %} aria-current="date"{% endif %}>
+              <span class="calendar-date-desktop">{{ day.date.day }}</span>
+              <span class="calendar-date-mobile">{{ day.date|date:"D, j E"|capfirst }}</span>
+            </time>
+            {% if day.tasks %}
+              <ul class="list-unstyled mb-0 calendar-tasks">
+                {% for task in day.tasks %}
+                  <li>
+                    <a href="{% url 'tasks:detail' task.pk %}" class="calendar-task calendar-task--{{ task.kind }}{% if task.status == 'done' %} calendar-task--done{% endif %}">
+                      <span class="calendar-task-meta">
+                        <time datetime="{{ task.due_at|date:'c' }}">{{ task.due_at|date:"H:i" }}</time>
+                        <span>{{ task.get_kind_display }}</span>
+                      </span>
+                      <span class="calendar-task-title">{{ task.title }}</span>
+                      <span class="calendar-task-case">{{ task.case.number }}</span>
+                      {% if task.status == "done" %}<span class="visually-hidden"> · Выполнено</span>{% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% elif day.date == today %}
+              <p class="calendar-today-empty text-muted mb-0">На сегодня нет задач и сроков.</p>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="calendar-day calendar-day--outside" aria-hidden="true"></div>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+  {% if not task_count and not has_today %}
+    <p class="calendar-empty text-muted mb-0">В этом месяце нет задач и контрольных сроков.</p>
+  {% endif %}
+</section>

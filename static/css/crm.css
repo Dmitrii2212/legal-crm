@@ -1,0 +1,188 @@
+:root {
+  --crm-navy: #142b44;
+  --crm-nav: #193652;
+  --crm-accent: #245bc1;
+  --crm-gold: #edbf68;
+  --crm-border: #dce4ef;
+  --crm-muted: #536579;
+  --crm-background: #f1f5fa;
+  --crm-radius: .55rem;
+  --bs-body-bg: var(--crm-background);
+  --bs-body-color: #192d42;
+  --bs-secondary-color: #536579;
+  --bs-secondary-color-rgb: 83, 101, 121;
+  --bs-border-color: var(--crm-border);
+  --bs-link-color-rgb: 36, 91, 193;
+  --bs-link-hover-color-rgb: 24, 66, 146;
+  --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body { min-width: 0; }
+
+.app-shell {
+  width: min(100%, 84rem);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 3vw, 2.5rem);
+}
+
+.app-header { background: var(--crm-navy); color: #fff; }
+
+.app-top {
+  display: flex;
+  min-height: 4.15rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.app-brand {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: .7rem;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.08rem;
+  letter-spacing: .01em;
+  text-decoration: none;
+}
+
+.app-brand:hover { color: #fff; }
+
+.app-mark {
+  position: relative;
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #71849a;
+  border-radius: .4rem;
+  background: #203b55;
+}
+
+.app-mark::before,
+.app-mark::after {
+  position: absolute;
+  display: block;
+  border-radius: 1px;
+  content: "";
+}
+
+.app-mark::before {
+  inset: .4rem .4rem .42rem;
+  border: 1.5px solid #f0f4fb;
+  border-top-left-radius: .22rem;
+  border-bottom-right-radius: .22rem;
+}
+
+.app-mark::after {
+  inset: .79rem .63rem auto;
+  height: .12rem;
+  background: var(--crm-gold);
+  box-shadow: 0 .25rem 0 #c9d7e8;
+}
+
+.app-account {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: clamp(.45rem, 2vw, 1rem);
+  color: #e1eaf6;
+  font-size: .875rem;
+}
+
+.app-zone {
+  border: 1px solid #587086;
+  border-radius: .28rem;
+  padding: .1rem .36rem;
+  color: #e1eaf6;
+  font-size: .72rem;
+  letter-spacing: .055em;
+}
+
+.app-username {
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-signout {
+  min-height: 2.2rem;
+  border: 1px solid transparent;
+  border-radius: .35rem;
+  padding: .25rem .5rem;
+  background: transparent;
+  color: #fff;
+}
+
+.app-signout:hover { border-color: #71849a; background: var(--crm-nav); }
+
+.app-nav-band { background: var(--crm-nav); border-top: 1px solid #ffffff17; }
+
+.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .2rem;
+}
+
+.app-nav a {
+  display: flex;
+  min-height: 2.9rem;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  padding-inline: clamp(.55rem, 1.25vw, 1rem);
+  color: #e4edf7;
+  font-size: .875rem;
+  font-weight: 550;
+  text-decoration: none;
+}
+
+.app-nav a:hover { background: #254666; color: #fff; }
+
+.app-nav a[aria-current] {
+  border-bottom-color: var(--crm-gold);
+  background: #294c70;
+  color: #fff;
+}
+
+.app-header :focus-visible { outline: 2px solid #ffda8a; outline-offset: -3px; }
+
+.skip-link {
+  position: fixed;
+  z-index: 5;
+  padding: .5rem 1rem;
+  background: #fff;
+}
+
+.app-main { padding-block: clamp(1.3rem, 3vw, 2.4rem) 3.5rem; }
+.app-main:focus { outline: none; }
+
+.page-header { margin-bottom: 1.4rem; }
+.page-header h1, .login-card h1 { letter-spacing: -.025em; }
+.surface, .card { background: #fff; border: 1px solid var(--crm-border); border-radius: var(--crm-radius); }
+.card, .surface { box-shadow: 0 1px 2px #142b4408; }
+.card-header, .card-footer { background: #f8fafd; }
+.table { --bs-table-bg: #fff; --bs-table-hover-bg: #f2f6fc; }
+.table thead th { --bs-table-bg: #f5f8fc; white-space: nowrap; color: #374c62; font-size: .84rem; }
+.table td, .table th { padding: .78rem .95rem; }
+.form-label { font-weight: 600; }
+.form-control, .form-select { background-color: #fff; }
+.form-control:focus, .form-select:focus { background-color: #fff; }
+.form-check-input { background-color: #fff; }
+.btn-primary { --bs-btn-bg: var(--crm-accent); --bs-btn-border-color: var(--crm-accent); --bs-btn-hover-bg: #1c4ca7; --bs-btn-hover-border-color: #1c4ca7; }
+.badge { font-weight: 600; }
+
+.login-card {
+  width: min(100%, 26rem);
+  margin: clamp(1rem, 8vh, 6rem) auto 0;
+  border-top: 3px solid var(--crm-accent);
+  padding: clamp(1.25rem, 4vw, 2.2rem);
+}
+
+@media (max-width: 480px) {
+  .app-nav { column-gap: 0; }
+  .app-nav a { min-height: 2.75rem; padding-inline: .42rem; font-size: .8rem; }
+  .app-zone { display: none; }
+  .app-username { max-width: 28vw; }
+  .table td, .table th { padding-inline: .7rem; }
+}

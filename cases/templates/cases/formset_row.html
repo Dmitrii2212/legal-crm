@@ -1,0 +1,18 @@
+<div class="border rounded p-3" data-formset-row>
+    {% for hidden in row.hidden_fields %}
+        {{ hidden }}
+        {% for error in hidden.errors %}<p class="text-danger small mb-2">{{ error }}</p>{% endfor %}
+    {% endfor %}
+    {% for error in row.non_field_errors %}<p class="text-danger small">{{ error }}</p>{% endfor %}
+    <div class="row g-3 align-items-end">
+        {% for field in row.visible_fields %}
+            {% if field.name == 'DELETE' %}
+                <div class="col-12">
+                    <label class="small text-body-secondary" for="{{ field.id_for_label }}">{{ field }} Удалить строку</label>
+                </div>
+            {% else %}
+                <div class="col-md">{% include 'cases/form_field.html' with field=field %}</div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ client.full_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="Навигация по разделу">
+    <a href="{% url 'clients:list' %}">Все клиенты</a>
+</nav>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mt-3 mb-4">
+    <div>
+        <h1 class="mb-1">{{ client.full_name }}</h1>
+        <p class="text-body-secondary mb-0">{{ client.get_client_type_display }}</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{% url 'clients:edit' client.pk %}">Редактировать</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <section class="card h-100">
+            <div class="card-body">
+                <h2 class="h4 mb-3">Реквизиты и контакты</h2>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">ИНН</dt>
+                    <dd class="col-sm-8">{{ client.tax_id|default:"—" }}</dd>
+                    {% if client.client_type == 'company' %}
+                        <dt class="col-sm-4">ОГРН</dt>
+                        <dd class="col-sm-8">{{ client.registration_number|default:"—" }}</dd>
+                        <dt class="col-sm-4">КПП</dt>
+                        <dd class="col-sm-8">{{ client.kpp|default:"—" }}</dd>
+                    {% elif client.client_type == 'sole_proprietor' %}
+                        <dt class="col-sm-4">ОГРНИП</dt>
+                        <dd class="col-sm-8">{{ client.registration_number|default:"—" }}</dd>
+                    {% endif %}
+                    <dt class="col-sm-4">Контактное лицо</dt>
+                    <dd class="col-sm-8">{{ client.contact_name|default:"—" }}</dd>
+                    <dt class="col-sm-4">Телефон</dt>
+                    <dd class="col-sm-8">{% if client.phone %}<a href="tel:{{ client.phone }}">{{ client.phone }}</a>{% else %}—{% endif %}</dd>
+                    <dt class="col-sm-4">Электронная почта</dt>
+                    <dd class="col-sm-8 text-break">{% if client.email %}<a href="mailto:{{ client.email }}">{{ client.email }}</a>{% else %}—{% endif %}</dd>
+                    <dt class="col-sm-4">Адрес</dt>
+                    <dd class="col-sm-8">{{ client.address|default:"—" }}</dd>
+                </dl>
+                {% if client.notes %}
+                    <h3 class="h6 mt-3">Заметки</h3>
+                    <p class="mb-0">{{ client.notes|linebreaksbr }}</p>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-5">
+        <section class="card h-100">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <h2 class="h4 mb-0">Дела клиента</h2>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'cases:create' %}?client={{ client.pk }}">Добавить дело</a>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for case in client.cases.all %}
+                        <li class="list-group-item px-0">
+                            <a href="{{ case.get_absolute_url }}">{{ case.title }}</a>
+                            <div class="small text-body-secondary">{{ case.number }} · {{ case.get_stage_display }}</div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item px-0 text-body-secondary">У клиента пока нет дел.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

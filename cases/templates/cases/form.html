@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if case.pk %}Редактирование дела{% else %}Новое дело{% endif %}{% endblock %}
+
+{% block content %}
+<nav class="mb-3" aria-label="Навигация по делам">
+    {% if case.pk %}
+        <a href="{{ case.get_absolute_url }}">{{ case.number }}</a>
+    {% else %}
+        <a href="{% url 'cases:list' %}">Все дела</a>
+    {% endif %}
+</nav>
+<h1 class="h2 mb-4">{% if case.pk %}Редактирование дела{% else %}Новое дело{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <section class="card card-body mb-3" aria-labelledby="case-fields-heading">
+        <h2 class="h5 mb-3" id="case-fields-heading">Сведения о деле</h2>
+        {% for error in form.non_field_errors %}<p class="alert alert-danger">{{ error }}</p>{% endfor %}
+        <div class="row g-3">
+            <div class="col-md-4">{% include 'cases/form_field.html' with field=form.number %}</div>
+            <div class="col-md-8">{% include 'cases/form_field.html' with field=form.title %}</div>
+            <div class="col-md-8">{% include 'cases/form_field.html' with field=form.client %}</div>
+            <div class="col-md-4">{% include 'cases/form_field.html' with field=form.stage %}</div>
+            <div class="col-md-8">{% include 'cases/form_field.html' with field=form.court_name %}</div>
+            <div class="col-md-4">{% include 'cases/form_field.html' with field=form.judge %}</div>
+            <div class="col-12">{% include 'cases/form_field.html' with field=form.court_details %}</div>
+        </div>
+    </section>
+    {% include 'cases/formset.html' with formset=participants heading='Участники дела' add_label='Добавить участника' only %}
+    {% include 'cases/formset.html' with formset=materials heading='Материалы дела' add_label='Добавить ссылку' only %}
+    <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">Сохранить дело</button>
+        {% if case.pk %}
+            <a class="btn btn-outline-secondary" href="{{ case.get_absolute_url }}">Отмена</a>
+        {% else %}
+            <a class="btn btn-outline-secondary" href="{% url 'cases:list' %}">Отмена</a>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}<script src="{% static 'cases/formsets.js' %}" defer></script>{% endblock %}
