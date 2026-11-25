@@ -3,6 +3,7 @@
 !.env.example
 compose.override.yaml
 .venv/
+.venv-demo/
 venv/
 __pycache__/
 *.py[cod]
@@ -11,3 +12,4 @@ __pycache__/
 staticfiles/
 *.log
 *.sqlite3
+*.sqlite3-*

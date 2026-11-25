@@ -1,19 +1,59 @@
 from datetime import datetime, time, timedelta
 
-from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand, CommandError
+from django.db import connection, transaction
 from django.utils import timezone
 
 from cases.models import Case, CaseMaterial, CaseParticipant
 from clients.models import Client
 from tasks.models import Task
 
+DEMO_USERNAME = "demo"
+DEMO_PASSWORD = "legalcrm-demo"
+
 
 class Command(BaseCommand):
     help = "Создаёт вымышленные карточки, учебное дело и задачи для знакомства с CRM."
 
-    @transaction.atomic
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--with-demo-user",
+            action="store_true",
+            help="Создать учебную учётную запись для локального режима SQLite.",
+        )
+
     def handle(self, *args, **options):
+        with_demo_user = options["with_demo_user"]
+        sqlite_demo = getattr(settings, "DEMO_MODE", False) and connection.vendor == "sqlite"
+        if with_demo_user and not sqlite_demo:
+            raise CommandError("Учебная учётная запись доступна только в локальном режиме SQLite.")
+
+        with transaction.atomic():
+            demo_can_sign_in = with_demo_user and self.ensure_demo_user()
+            if not with_demo_user or not Client.objects.exists():
+                self.seed_records()
+
+        self.stdout.write(self.style.SUCCESS("Учебные данные доступны в CRM."))
+        if demo_can_sign_in:
+            self.stdout.write(f"Login: {DEMO_USERNAME} | Password: {DEMO_PASSWORD}")
+        elif with_demo_user:
+            self.stdout.write("Учётная запись demo уже настроена. Используйте её текущий пароль.")
+
+    def ensure_demo_user(self):
+        user, created = get_user_model().objects.get_or_create(username=DEMO_USERNAME)
+        if created:
+            user.set_password(DEMO_PASSWORD)
+            user.save(update_fields=["password"])
+            return True
+        return (
+            user.is_active
+            and not (user.is_staff or user.is_superuser)
+            and user.check_password(DEMO_PASSWORD)
+        )
+
+    def seed_records(self):
         people = (
             (Client.Type.PERSON, "Пробная Анна Демовна", "person@example.com"),
             (Client.Type.SOLE_PROPRIETOR, "ИП Учебный Лев Макетович", "entrepreneur@example.com"),
@@ -63,5 +103,3 @@ class Command(BaseCommand):
                 case=case, title=title,
                 defaults={"kind": kind, "due_at": due_at, "status": status},
             )
-
-        self.stdout.write(self.style.SUCCESS("Учебные данные доступны в CRM."))

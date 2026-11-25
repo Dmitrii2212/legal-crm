@@ -3,7 +3,10 @@
 .env.*
 compose.override.yaml
 .venv
+.venv-demo
 venv
+*.sqlite3
+*.sqlite3-*
 **/__pycache__
 **/*.py[cod]
 .coverage

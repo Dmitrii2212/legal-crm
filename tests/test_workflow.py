@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client as BrowserClient
 from django.test import TestCase
@@ -70,7 +71,7 @@ class AuthenticationTests(TestCase):
         self.assertEqual(browser.post(path, data).status_code, 403)
         self.assertFalse(Client.objects.filter(full_name=data["full_name"]).exists())
         self.assertEqual(browser.get(path).status_code, 200)
-        data["csrfmiddlewaretoken"] = browser.cookies["csrftoken"].value
+        data["csrfmiddlewaretoken"] = browser.cookies[settings.CSRF_COOKIE_NAME].value
         self.assertEqual(browser.post(path, data).status_code, 302)
         self.assertTrue(Client.objects.filter(full_name=data["full_name"]).exists())
 
